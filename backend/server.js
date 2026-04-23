@@ -3,6 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const nodemailer = require('nodemailer');
+const authRoutes = require('./routes/authRoutes');
+const doctorRoutes = require('./routes/doctorRoutes');
 
 dotenv.config();
 const app = express();
@@ -13,6 +15,20 @@ connectDB();
 // 2. MIDDLEWARE (Crucial: CORS must be before routes)
 app.use(cors()); 
 app.use(express.json());
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'Clinico Backend API Running', status: 'OK' });
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'Healthy', timestamp: new Date().toISOString() });
+});
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api', doctorRoutes);
 
 // 3. OTP EMAIL CONFIGURATION
 const transporter = nodemailer.createTransport({
